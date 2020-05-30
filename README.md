@@ -1,29 +1,18 @@
-# README #
+## 概要
 
-This README would normally document whatever steps are necessary to get your application up and running.
+FC2の新着情報RSS (https://blog.fc2.com/newentry.rdf) からデータを取得し、画面で検索できるWebアプリケーションです。
 
-### What is this repository for? ###
+PHPのフレームワークは使わずに開発しました。
+ライブラリはPHPテンプレートエンジンのBladeのみ使用しています。
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+## 技術詳細
 
-### How do I get set up? ###
+### PHP
+php -v                                                                                                                                          ~/dev/rss-getter-from-fc2
+PHP 7.3.11 (cli) (built: Feb 29 2020 02:50:36) ( NTS )
+Copyright (c) 1997-2018 The PHP Group
+Zend Engine v3.3.11, Copyright (c) 1998-2018 Zend Technologies
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+### MySQL
+mysql --version
+mysql  Ver 14.14 Distrib 5.6.47, for osx10.15 (x86_64) using  EditLine wrapper
