@@ -1,0 +1,2 @@
+*/5 * * * * php Commands/RegistRssData.php # 5分ごと実行
+2 0 * * * php Commands/DeleteOldRssData.php # デイリーで0時2分に実行
