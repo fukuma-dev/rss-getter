@@ -16,6 +16,12 @@ class ViewService
         $this->repository = new ViewRepository();
     }
 
+    /**
+     * 検索結果用にデータを取得
+     *
+     * @param array $params
+     * @return array
+     */
     public function getDataByCondition(array $params)
     {
         $results = [];

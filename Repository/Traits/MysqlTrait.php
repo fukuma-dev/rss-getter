@@ -3,6 +3,12 @@ namespace Repository\Traits;
 
 trait MysqlTrait
 {
+    /**
+     * 検索条件をMySQL用のWhereに整形する
+     *
+     * @param array $conditions
+     * @return string
+     */
     public function createWhereByConditions(array $conditions)
     {
         $where = [];

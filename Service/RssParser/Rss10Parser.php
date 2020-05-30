@@ -4,6 +4,7 @@ include 'RssParser.php';
 
 class Rss10Parser extends RssParser {
 
+    // RSS1.0(RDF)にフォーマットを合わせる
     Const DC_NAMESPACE = 'http://purl.org/dc/elements/1.1/';
 
     public function getTitle($item) {

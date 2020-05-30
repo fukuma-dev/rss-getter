@@ -11,6 +11,12 @@ class RssParserService
         $this->Rss10Parser = new Rss10Parser;
     }
 
+    /**
+     * RSSを解析してデータを取得する
+     *
+     * @param $url
+     * @return array
+     */
     public function getRssDataByParsing($url)
     {
         try {

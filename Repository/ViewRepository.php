@@ -23,21 +23,43 @@ class ViewRepository implements ViewRepositoryInterface
         }
     }
 
+    /**
+     * @param $key
+     * @param $value
+     * @return array
+     */
     public function getGreaterThanOrEqualToCondition($key, $value)
     {
         return [$key, '>=', $value];
     }
 
+    /**
+     * @param $key
+     * @param $value
+     * @return array
+     */
     public function getLikeCondition($key, $value)
     {
         return [$key, 'LIKE', "'%$value%'"];
     }
 
+    /**
+     * 検索条件をMySQL用のWhereに整形する
+     *
+     * @param array $conditions
+     * @return string
+     */
     public function combineSearchConditions(array $conditions)
     {
         return $this->createWhereByConditions($conditions);
     }
 
+    /**
+     * レコード数を取得
+     *
+     * @param array $conditions
+     * @return int
+     */
     public function getCountDisplayData($conditions = [])
     {
         if ($conditions !== []) {
@@ -49,7 +71,14 @@ class ViewRepository implements ViewRepositoryInterface
         return $this->mysqli->query($query)->num_rows;
     }
 
-    // TODO: 汎用的にする
+    /**
+     * 結果ページ用のクエリ実行
+     *
+     * @param $conditions
+     * @param $limit
+     * @param $offset
+     * @return mixed
+     */
     public function getDisplayDataForResultPage($conditions, $limit, $offset)
     {
         if ($conditions !== []) {
