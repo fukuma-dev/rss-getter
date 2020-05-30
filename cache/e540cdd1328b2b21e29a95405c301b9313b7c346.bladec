@@ -1,0 +1,12 @@
+<?php $_shouldextend[1]=1; ?>
+
+<?php $this->startSection('header'); ?>
+ <?php echo $this->runChild('header'); ?>
+<?php $this->stopSection(); ?>
+
+<?php $this->startSection('content'); ?>
+ <?php /*index.phpのフォームだけクッキーの検索条件を適用する*/ ?>
+ <?php echo $this->runChild('form', ['cookie' => $_COOKIE]); ?>
+<?php $this->stopSection(); ?>
+
+<?php if (@$_shouldextend[1]) { echo $this->runChild('layout.master'); } ?>

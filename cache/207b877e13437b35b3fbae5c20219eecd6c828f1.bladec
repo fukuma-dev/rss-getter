@@ -1,0 +1,20 @@
+<DOCTYPE HTML>
+ <html lang="ja">
+ <head>
+ <title>FC2 RSSキャッチャー</title>
+ </head>
+ <body>
+ <?php echo $this->yieldContent('content'); ?>
+ </body>
+ </html>
+</DOCTYPE>
+<style>
+ body {
+ font-family: "Helvetica Neue",
+ Arial,
+ "Hiragino Kaku Gothic ProN",
+ "Hiragino Sans",
+ Meiryo,
+ sans-serif;
+ }
+</style>
