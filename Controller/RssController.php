@@ -9,9 +9,15 @@ use Service\RssService;
 
 class RssController
 {
-    public function search()
+    /**
+     * RSS検索
+     *
+     * @param array $params
+     * @return array
+     */
+    public function search(array $params)
     {
-        $error = $this->validation($_GET);
+        $error = $this->validation($params);
         if ($error !== []) {
             return ['error' => $error];
         }
@@ -19,14 +25,25 @@ class RssController
         $db = $this->dbConnection();
         $viewService = new RssService($db);
 
-        return $viewService->getDataByCondition($_GET);
+        return $viewService->getDataByCondition($params);
     }
 
+    /**
+     * フォームのバリデート
+     *
+     * @param $params
+     * @return array
+     */
     private function validation($params)
     {
         $error = [];
 
-        // エントリーNo.のバリデーション
+        // サーバー番号
+        if($params['server_number'] !== '' && !ctype_digit($params['server_number'])) {
+            array_push($error, "サーバー番号は整数を入力してください。");
+        }
+
+        // エントリーNo
         if($params['entry_number'] !== '' && !ctype_digit($params['entry_number'])) {
             array_push($error, "エントリーNo.は整数を入力してください。");
         }
@@ -34,6 +51,9 @@ class RssController
         return $error;
     }
 
+    /**
+     * @return mysqli
+     */
     private function dbConnection()
     {
         $env = Dotenv::createImmutable(__DIR__.'/..');
