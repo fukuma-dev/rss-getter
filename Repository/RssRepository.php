@@ -2,25 +2,21 @@
 namespace Repository;
 include 'RssRepositoryInterface.php';
 include 'Traits/MysqlTrait.php';
+require __DIR__.'/../vendor/autoload.php';
 
-use mysqli;
 use Repository\Traits\MysqlTrait;
+use Dotenv\Dotenv;
 
-class RssRepository implements RssRepositoryInterface
+class RssRepository extends BaseRepository implements RssRepositoryInterface
 {
+    // TODO: Mysqlに依存させない
     use MysqlTrait;
-    protected $mysqli;
 
     public function __construct()
     {
-        // TODO: envから渡す
-        $this->mysqli = new mysqli('127.0.0.1','root', '', 'rss_reader');
-        if (mysqli_connect_errno()) {
-            printf("Connect failed: %s\n", mysqli_connect_error());
-            exit();
-        } else {
-            $this->mysqli->set_charset("utf8mb4");
-        }
+        $dotenv = Dotenv::createImmutable(__DIR__.'/..');
+        $dotenv->load();
+        parent::__construct(getenv('DB_HOST'), getenv('DB_USER'), getenv('DB_PASS'), getenv('DB_NAME'));
     }
 
     /**
