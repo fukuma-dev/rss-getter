@@ -39,33 +39,71 @@ FC2のURLのフォーマット
 
 ## 導入手順書
 
-環境構築の項目を順番に行ってください。
+`2. 環境構築` の必須項目を上から順番に行ってください。
 
 下記に示す動作環境が用意されている前提ですが  
 必要に応じて、`Amazon Linux 2 における PHP, MySQL, Apacheの導入` をご覧ください。
 
-### 動作環境
+### 1. 動作環境
 - PHP 7.3
 - MySQL 5.7
 - Apache 2.4
 - Amazon Linux 2
 
-### 環境構築
+### 2. 環境構築
+Amazon Linux 2での導入を前提とします。
 
-#### simple-xmlのインストール
+#### 2.1 git clone
+こちらのファイルをローカルにcloneします。
+http, sshはお好みで構いません。
 ```
-yum -y install --enablerepo=remi,epel,remi-php70 php php-devel php-intl php-mbstring php-pdo php-gd php-mysqlnd php-xml
+# http
+git clone https://RyutaroFukuma@bitbucket.org/RyutaroFukuma/fc2-rss-getter.git
+
+# ssh
+git clone git@bitbucket.org:RyutaroFukuma/fc2-rss-getter.git
 ```
 
-#### composerのインストール
+#### 2.2 サーバーにファイルアップロード
+scpコマンドを用いてcloneしたファイルを対象のサーバーにアップロードします。  
+
+この際にPermission Deniedされる場合、  
+アップロード先のサーバーに入り、ディレクトリの権限をchmodを用いて一時的に変更する必要があります。  
+
+アップロード先のディレクトリは/etc/httpd/conf/httpd.confにあるDocumentRootを指定するか  
+DocumentRootをアップロード先のディレクトリに変更してください。  
+
+その際にhttpd.confを変更した場合はapacheの再起動も行ってください。
+
+また、Directory Indexをindex.phpに変更してください。
+
 ```
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-sudo php composer-setup.php  --install-dir=/usr/local/bin --filename=composer
-php -r "unlink('composer-setup.php');"
+# apache再起動
+$ sudo service httpd restart
 ```
 
-#### .env作成
+#### 2.3 composerのインストール(必須)
+
+composerがない場合はインストールが必要です。  
+phpdotenvというライブラリを使用してDBの接続情報をenvファイルで管理します。
+```
+$ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+$ php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+$ sudo php composer-setup.php  --install-dir=/usr/local/bin --filename=composer
+$ php -r "unlink('composer-setup.php');"
+```
+
+既にcomposerが入っている場合は`composer install`してください。
+```
+$ composer install
+```
+
+#### 2.4 env作成(必須)
+
+DBの接続情報を管理するため、envファイルを作成します。
+
+中身はDB作成後に指定してください。  
+DB_HOSTはホスト名、DB_USERはユーザー名、DB_PASSはパスワード、DB_NAMEは作成するDBの名前になります。
 ```
 $ cp .env.copy .env
 $ vim .env
@@ -77,14 +115,12 @@ DB_PASS=""
 DB_NAME="rss_db"
 ```
 
-#### phpdotenv
-```
-composer require vlucas/phpdotenv
-```
-
 #### DB・テーブル作成
 
 MySQLにログインできることが前提となります。
+MySQLが入ってない場合は後述する` Amazon Linux 2 における PHP, MySQL, Apacheの導入` をご覧ください。
+
+DB作成と必要なテーブルの作成
 ```
 CREATE DATABASE IF NOT EXISTS rss_db;
 
@@ -104,16 +140,30 @@ CREATE TABLE `fc2_rss_feed` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2729 DEFAULT CHARSET=utf8mb4 COMMENT='RSSデータ';
 ```
 
-#### cronの設定
+#### cronの設定(必須)
 
-Linuxにログインできることが前提となります。
+Linuxにログインできることが前提となります。  
+EC2のAmazon Linux 2で設定をしています。  
+
+RSSデータの取得と削除のコマンドを設定します。
 ```
 $ crontab -e
 
-# crontab.productionファイルと同じ内容を記載
+# crontab.productionファイルと同じ内容を記載(ドキュメントルートによってパスが変わるので注意)
 ```
 
-#### タイムゾーンを'Asia/Tokyo'に変更(必要に応じて)
+#### simple-xmlのインストール(必須)
+
+simplexml_load_stringを使用するためにインストールします。
+```
+yum -y install --enablerepo=remi,epel,remi-php70 php php-devel php-intl php-mbstring php-pdo php-gd php-mysqlnd php-xml
+```
+
+#### タイムゾーンを'Asia/Tokyo'に変更(任意)
+
+記事の投稿日をdate関数を用いて変換しているため  
+サーバーのタイムゾーンを気にする必要があります。  
+設定がずれている場合は変更してください。
 
 php.ini
 ```
