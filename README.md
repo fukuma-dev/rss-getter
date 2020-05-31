@@ -16,6 +16,11 @@ FC2の新着情報RSS (https://blog.fc2.com/newentry.rdf) からデータを取�
 保存するデータは  
 記事のタイトル、記事の概要、URL、投稿日、ユーザー名、サーバー番号、エントリー番号 です。
 
+ユーザー名、サーバー番号、エントリーNo.はFC2の記事URLのフォーマットを解析して取得しています。  
+`http://(ユーザー名).blog(サーバー番号).fc2.com/blog-entry-(エントリーNo.).html`
+
+また、重複データがあった場合は登録しない実装にしています。
+
 #### 検索
 - 下記に示す検索条件と表示内容を担保する検索機能の実装
 
@@ -34,15 +39,14 @@ FC2の新着情報RSS (https://blog.fc2.com/newentry.rdf) からデータを取�
 - 新着順に表示
 - ページャー
 
-FC2のURLのフォーマット  
-`http://(ユーザー名).blog(サーバー番号).fc2.com/blog-entry-(エントリーNo.).html`
+---
 
 ## 導入手順書
 
 `2. 環境構築` の必須項目を上から順番に行ってください。
 
 下記に示す動作環境が用意されている前提ですが  
-必要に応じて、`Amazon Linux 2 における PHP, MySQL, Apacheの導入` をご覧ください。
+必要に応じて、後述する `Amazon Linux 2 における PHP, MySQL, Apacheの導入` をご覧ください。
 
 ### 1. 動作環境
 - PHP 7.3
@@ -115,7 +119,7 @@ DB_PASS=""
 DB_NAME="rss_db"
 ```
 
-#### DB・テーブル作成
+#### 2.5 DB・テーブル作成
 
 MySQLにログインできることが前提となります。
 MySQLが入ってない場合は後述する` Amazon Linux 2 における PHP, MySQL, Apacheの導入` をご覧ください。
@@ -140,7 +144,7 @@ CREATE TABLE `fc2_rss_feed` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2729 DEFAULT CHARSET=utf8mb4 COMMENT='RSSデータ';
 ```
 
-#### cronの設定(必須)
+#### 2.6 cronの設定(必須)
 
 Linuxにログインできることが前提となります。  
 EC2のAmazon Linux 2で設定をしています。  
@@ -152,7 +156,7 @@ $ crontab -e
 # crontab.productionファイルと同じ内容を記載(ドキュメントルートによってパスが変わるので注意)
 ```
 
-#### simple-xmlのインストール(必須)
+#### 2.7 simple-xmlのインストール(必須)
 
 simplexml_load_stringを使用するためにインストールします。
 ```
