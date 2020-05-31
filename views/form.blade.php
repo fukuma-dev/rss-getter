@@ -13,7 +13,6 @@
     </div>
     <div style="height: 70px; width: 160px;">
         <label for="entry_number">エントリーNo.</label><input type="text" name="entry_number" id="entry_number" value="{{ $_GET['entry_number'] ?: $cookie['entry_number'] }}" style="height: 20px;">
-        <input name="is_greater_than_or_equal_to" type="hidden" value="0">
         <input type="checkbox" name= "is_greater_than_or_equal_to" id="is_greater_than_or_equal_to" value="checked" {{ isset($cookie['is_greater_than_or_equal_to']) ? 'checked' : $_GET['is_greater_than_or_equal_to']}}>
         <label for="is_greater_than_or_equal_to" style="font-size: 12px;">指定No.以上の値も検索</label>
     </div>
