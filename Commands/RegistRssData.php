@@ -7,11 +7,10 @@ use Service\RssParser\RssParserService;
 use Service\UrlParser\Fc2UrlParser;
 use Repository\RssRepository;
 
-// TODO: 外部からURL読み込む形にする
-$targetRss = 'https://blog.fc2.com/newentry.rdf';
+const TARGET_URL = 'https://blog.fc2.com/newentry.rdf';
 
 $rssParser = new RssParserService();
-$parsedRssData = $rssParser->getRssDataByParsing($targetRss);
+$parsedRssData = $rssParser->getRssDataByParsing(TARGET_URL);
 
 $fc2UrlParser = new Fc2UrlParser();
 $dataForDb = [];
