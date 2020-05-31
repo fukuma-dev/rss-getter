@@ -35,6 +35,7 @@ class ViewService
 
             if ($key == 'entry_number' && $value !== '') {
                 array_push($conditions, $this->repository->getGreaterThanOrEqualToCondition($key, $value));
+                continue;
             }
 
             if ($value !== '' && in_array($key, self::ALLOWED_PARAMS)) {

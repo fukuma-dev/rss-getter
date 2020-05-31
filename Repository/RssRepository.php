@@ -1,5 +1,6 @@
 <?php
 namespace Repository;
+include 'BaseRepository.php';
 include 'RssRepositoryInterface.php';
 include 'Traits/MysqlTrait.php';
 require __DIR__.'/../vendor/autoload.php';
