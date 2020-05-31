@@ -8,8 +8,18 @@ class RssService
 {
     private $repository;
 
+    /**
+     * 1ページあたりの表示記事(ページャ用)
+     */
     const DISPLAY_MAX = 5;
-    const ALLOWED_PARAMS = ['post_datetime', 'url', 'user_name', 'server_number', 'entry_number'];
+    /**
+     * 完全一致を条件とするパラメータ
+     */
+    const EQUAL_TO_CONDITION_PARAMS = ['server_number', 'entry_number'];
+    /**
+     * 部分一致を条件とするパラメータ
+     */
+    const LIKE_CONDITION_PARAMS = ['post_datetime', 'url', 'user_name'];
 
     public function __construct($db)
     {
@@ -35,9 +45,15 @@ class RssService
 
         $results = $this->repository->getDisplayDataForResultPage($conditions, self::DISPLAY_MAX, $offset);
 
-        return ['results' => $results, 'record_counts' => $recordCounts, 'display_max' => self::DISPLAY_MAX, 'allowed_display' => self::ALLOWED_PARAMS];
+        return ['results' => $results, 'record_counts' => $recordCounts, 'display_max' => self::DISPLAY_MAX];
     }
 
+    /**
+     * 検索条件の作成
+     *
+     * @param $params
+     * @return array|string
+     */
     private function createCondition($params)
     {
         $conditions = [];
@@ -48,12 +64,18 @@ class RssService
             // page_id以外の検索条件をクッキーに保存
             $this->setCookie($key, $value);
 
-            if ($key == 'entry_number' && $value !== '') {
-                array_push($conditions, $this->repository->getGreaterThanOrEqualToCondition($key, $value));
+            // = もしくは >= の検索条件を作成
+            if ($value !== '' && in_array($key, self::EQUAL_TO_CONDITION_PARAMS)) {
+                if ($key == 'entry_number' && $value !== '' && $params['is_greater_than_or_equal_to'] === 'checked') {
+                    array_push($conditions, $this->repository->getGreaterThanOrEqualToCondition($key, $value));
+                    continue;
+                }
+                array_push($conditions, $this->repository->getEqualToCondition($key, $value));
                 continue;
             }
 
-            if ($value !== '' && in_array($key, self::ALLOWED_PARAMS)) {
+            // 部分一致の条件を作成
+            if ($value !== '' && in_array($key, self::LIKE_CONDITION_PARAMS)) {
                 array_push($conditions, $this->repository->getLikeCondition($key, $value));
             }
         }
@@ -64,8 +86,14 @@ class RssService
         return $conditions;
     }
 
+    /**
+     * クッキーを保存する
+     *
+     * @param $key
+     * @param $value
+     */
     private function setCookie($key, $value)
     {
-        setcookie($key, $value ?: '');
+        setcookie($key, $value ?: '', time()+60*60*24*7);
     }
 }

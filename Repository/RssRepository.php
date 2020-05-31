@@ -21,7 +21,17 @@ class RssRepository implements RssRepositoryInterface
      * @param $value
      * @return array
      */
-    public function getGreaterThanOrEqualToCondition($key, $value)
+    public function getEqualToCondition($key, $value): array
+    {
+        return [$key, '=', $value];
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return array
+     */
+    public function getGreaterThanOrEqualToCondition($key, $value): array
     {
         return [$key, '>=', $value];
     }
@@ -31,7 +41,7 @@ class RssRepository implements RssRepositoryInterface
      * @param $value
      * @return array
      */
-    public function getLikeCondition($key, $value)
+    public function getLikeCondition($key, $value): array
     {
         return [$key, 'LIKE', "'%$value%'"];
     }
@@ -75,7 +85,7 @@ class RssRepository implements RssRepositoryInterface
     public function getDisplayDataForResultPage($conditions, $limit, $offset)
     {
         if ($conditions !== []) {
-            $query = "SELECT post_datetime, url, title, description FROM rss_data WHERE {$conditions}  ORDER BY post_datetime desc LIMIT {$limit} OFFSET {$offset}";
+            $query = "SELECT post_datetime, url, title, description FROM rss_data WHERE {$conditions} ORDER BY post_datetime desc LIMIT {$limit} OFFSET {$offset}";
         } else {
             $query = "SELECT post_datetime, url, title, description FROM rss_data ORDER BY post_datetime desc LIMIT {$limit} OFFSET {$offset}";
         }
@@ -85,7 +95,6 @@ class RssRepository implements RssRepositoryInterface
 
         return $results;
     }
-
 
     /**
      * 重複するレコードの有無チェック
