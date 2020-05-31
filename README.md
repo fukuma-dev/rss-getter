@@ -2,29 +2,44 @@
 
 FC2の新着情報RSS (https://blog.fc2.com/newentry.rdf) からデータを取得し、画面で検索できるWebアプリケーションです。
 
-### 要件
+### 技術詳細                                         
+- PHPのフレームワークは使わずに開発
+- テンプレートエンジンのBladeを使用
+- 環境変数の管理にcomposer経由でdotenvを利用
 
+### 機能要件
+
+#### RSS取得
+- 5分ごとにFC2の新着情報RSSと記事URLからデータを取得し、MySQLに保存
+- ２週間経過したデータは削除される 
+
+保存するデータは  
+記事のタイトル、記事の概要、URL、投稿日、ユーザー名、サーバー番号、エントリー番号 です。
+
+#### 検索
+- 下記に示す検索条件と表示内容を担保する検索機能
+
+```
 検索条件
-- 日付、URL、ユーザー名、サーバー番号、エントリーNo.
+日付、URL、ユーザー名、サーバー番号、エントリーNo.
 
 表示内容
-- 日付、URL、タイトル、descriptionです。
+日付、URL、タイトル、description
+```
 
-表示機能
+#### 新着情報RSSの閲覧画面
 - 新着順に表示
 - ページャー
 
 FC2のURLのフォーマット  
 `http://(ユーザー名).blog(サーバー番号).fc2.com/blog-entry-(エントリーNo.).html`
-                                                              
-### 技術詳細
-                                                   
-- PHPのフレームワークは使わずに開発
-- テンプレートエンジンのBladeを使用
-- 環境変数の管理にcomposer経由でdotenvを利用
 
+## 導入手順書
 
-## 導入
+環境構築の項目を順番に行ってください。
+
+下記に示す動作環境が用意されている前提ですが  
+必要に応じて、`Amazon Linux 2 における PHP, MySQL, Apacheの導入` をご覧ください。
 
 ### 動作環境
 - PHP 7.3
@@ -34,19 +49,39 @@ FC2のURLのフォーマット
 
 ### 環境構築
 
-.env作成
+#### simple-xmlのインストール
+```
+yum -y install --enablerepo=remi,epel,remi-php70 php php-devel php-intl php-mbstring php-pdo php-gd php-mysqlnd php-xml
+```
+
+#### composerのインストール
+```
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+sudo php composer-setup.php  --install-dir=/usr/local/bin --filename=composer
+php -r "unlink('composer-setup.php');"
+```
+
+#### .env作成
 ```
 $ cp .env.copy .env
 $ vim .env
 
-# DB作成後、必要な情報を記載
+# DB作成後、MySQL接続に必要な情報を記載
 DB_HOST=""
 DB_USER=""
 DB_PASS=""
-DB_NAME=""
+DB_NAME="rss_db"
 ```
 
-DB・テーブル作成
+#### phpdotenv
+```
+composer require vlucas/phpdotenv
+```
+
+#### DB・テーブル作成
+
+MySQLにログインできることが前提となります。
 ```
 CREATE DATABASE IF NOT EXISTS rss_db;
 
@@ -64,29 +99,18 @@ CREATE TABLE `fc2_rss_feed` (
   `create_date` datetime NOT NULL COMMENT '作成日時',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2729 DEFAULT CHARSET=utf8mb4 COMMENT='RSSデータ';
-｝｝
 ```
 
-simple-xmlのインストール
+#### cronの設定
+
+Linuxにログインできることが前提となります。
 ```
-yum -y install --enablerepo=remi,epel,remi-php70 php php-devel php-intl php-mbstring php-pdo php-gd php-mysqlnd php-xml
+$ crontab -e
+
+# crontab.productionファイルと同じ内容を記載
 ```
 
-composerのインストール
-```
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-sudo php composer-setup.php  --install-dir=/usr/local/bin --filename=composer
-php -r "unlink('composer-setup.php');"
-```
-
-phpdotenv
-```
-composer require vlucas/phpdotenv
-```
-
-
-タイムゾーンを'Asia/Tokyo'に変更
+#### タイムゾーンを'Asia/Tokyo'に変更(必要に応じて)
 
 php.ini
 ```
