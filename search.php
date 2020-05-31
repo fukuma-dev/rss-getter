@@ -12,4 +12,10 @@ $blade = new BladeOne($views, $cache,BladeOne::MODE_AUTO);
 $controller = new RssController();
 $results = $controller->search();
 
-echo $blade->run("search", ["data" => $results]);
+try {
+    echo $blade->run("search", ["data" => $results]);
+    exit();
+} catch (\Exception $e) {
+    printf($e->getMessage());
+    exit(1);
+}
