@@ -1,6 +1,6 @@
 <?php
 namespace Service\RssParser;
-require_once(dirname(__FILE__) . '/Rss10Parser.php');
+include __DIR__.'/Rss10Parser.php';
 
 class RssParserService
 {

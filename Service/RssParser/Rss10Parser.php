@@ -1,8 +1,8 @@
 <?php
 namespace Service\RssParser;
-include 'RssParser.php';
+include 'BaseRssParser.php';
 
-class Rss10Parser extends RssParser {
+class Rss10Parser extends BaseRssParser {
 
     // RSS1.0(RDF)にフォーマットを合わせる
     Const DC_NAMESPACE = 'http://purl.org/dc/elements/1.1/';

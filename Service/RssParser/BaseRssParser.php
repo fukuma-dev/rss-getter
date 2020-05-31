@@ -1,7 +1,7 @@
 <?php
 namespace Service\RssParser;
 
-abstract class RssParser {
+abstract class BaseRssParser {
 
     abstract protected function getTitle($item);
     abstract protected function getLink($item);
