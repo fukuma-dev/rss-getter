@@ -19,6 +19,8 @@ class RssParserService
      */
     public function getRssDataByParsing($url)
     {
+        $rssData = [];
+
         try {
             $content = file_get_contents($url);
             if ($content == false) {
@@ -36,14 +38,13 @@ class RssParserService
                 throw new \Exception("Failed to simplexml_load_string\n");
             }
 
-            $rssData = [];
             if ($rss->getName() === 'RDF') {
                 foreach ($rss->item as $item) {
                     array_push($rssData, $this->Rss10Parser->parse($item));
                 }
             }
         } catch (\Exception $e) {
-            exit("Error: {$e->getMessage()}");
+            printf($e->getMessage());
         }
 
         return $rssData;

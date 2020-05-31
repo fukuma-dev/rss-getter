@@ -1,15 +1,21 @@
 <?php
 include "lib/BladeOne.php";
-include 'Service/ViewService.php';
+include 'Controller/RssController.php';
 
 Use eftec\bladeone\BladeOne;
-use Service\ViewService;
+use Controller\RssController;
 
 $views = __DIR__ . '/views';
 $cache = __DIR__ . '/cache';
 $blade = new BladeOne($views, $cache,BladeOne::MODE_AUTO);
 
-$viewService = new ViewService();
-$data = $viewService->getDataByCondition($_GET);
+$controller = new RssController();
+$results = $controller->search($_GET);
 
-echo $blade->run("search", ["data" => $data]);
+try {
+    echo $blade->run("search", ["data" => $results]);
+    exit();
+} catch (\Exception $e) {
+    printf($e->getMessage());
+    exit(1);
+}

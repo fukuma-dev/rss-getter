@@ -1,23 +1,99 @@
 <?php
 namespace Repository;
-include 'BaseRepository.php';
 include 'RssRepositoryInterface.php';
 include 'Traits/MysqlTrait.php';
-require __DIR__.'/../vendor/autoload.php';
 
 use Repository\Traits\MysqlTrait;
-use Dotenv\Dotenv;
+use mysqli;
 
-class RssRepository extends BaseRepository implements RssRepositoryInterface
+class RssRepository implements RssRepositoryInterface
 {
-    // TODO: Mysqlに依存させない
     use MysqlTrait;
+    private $db;
 
-    public function __construct()
+    public function __construct(mysqli $db)
     {
-        $dotenv = Dotenv::createImmutable(__DIR__.'/..');
-        $dotenv->load();
-        parent::__construct(getenv('DB_HOST'), getenv('DB_USER'), getenv('DB_PASS'), getenv('DB_NAME'));
+        $this->db = $db;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return array
+     */
+    public function getEqualToCondition($key, $value): array
+    {
+        return [$key, '=', $value];
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return array
+     */
+    public function getGreaterThanOrEqualToCondition($key, $value): array
+    {
+        return [$key, '>=', $value];
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return array
+     */
+    public function getLikeCondition($key, $value): array
+    {
+        return [$key, 'LIKE', "'%$value%'"];
+    }
+
+    /**
+     * 検索条件をMySQL用のWhereに整形する
+     *
+     * @param array $conditions
+     * @return string
+     */
+    public function combineSearchConditions(array $conditions)
+    {
+        return $this->createWhereByConditions($conditions);
+    }
+
+    /**
+     * レコード数を取得
+     *
+     * @param array $conditions
+     * @return int
+     */
+    public function getCountDisplayData($conditions = [])
+    {
+        if ($conditions !== []) {
+            $query = "SELECT * FROM rss_data WHERE {$conditions}";
+        } else {
+            $query = "SELECT * FROM rss_data";
+        }
+
+        return $this->db->query($query)->num_rows;
+    }
+
+    /**
+     * 結果ページ用のクエリ実行
+     *
+     * @param $conditions
+     * @param $limit
+     * @param $offset
+     * @return mixed
+     */
+    public function getDisplayDataForResultPage($conditions, $limit, $offset)
+    {
+        if ($conditions !== []) {
+            $query = "SELECT post_datetime, url, title, description FROM rss_data WHERE {$conditions} ORDER BY post_datetime desc LIMIT {$limit} OFFSET {$offset}";
+        } else {
+            $query = "SELECT post_datetime, url, title, description FROM rss_data ORDER BY post_datetime desc LIMIT {$limit} OFFSET {$offset}";
+        }
+
+        $results = $this->db->query($query)->fetch_all();
+        $this->db->close();
+
+        return $results;
     }
 
     /**
@@ -32,7 +108,7 @@ class RssRepository extends BaseRepository implements RssRepositoryInterface
             return false;
         }
         $query = "SELECT * FROM rss_data WHERE url = '{$url}' LIMIT 1";
-        $results = $this->mysqli->query($query);
+        $results = $this->db->query($query);
         $isExists = $results->num_rows === 1;
         $results->close();
 
@@ -46,7 +122,7 @@ class RssRepository extends BaseRepository implements RssRepositoryInterface
      */
     public function insertData(array $data)
     {
-        $query = $this->mysqli->prepare("INSERT INTO rss_data (title, description, post_datetime, url, user_name, server_number, entry_number, create_date) VALUES (?, ?, ?, ?, ?, ?, ?, NOW());");
+        $query = $this->db->prepare("INSERT INTO rss_data (title, description, post_datetime, url, user_name, server_number, entry_number, create_date) VALUES (?, ?, ?, ?, ?, ?, ?, NOW());");
 
         if ($query) {
             $query->bind_param(
@@ -79,11 +155,12 @@ class RssRepository extends BaseRepository implements RssRepositoryInterface
         $where = $this->createWhereByConditions($conditions);
         $rawQuery = "DELETE FROM rss_data WHERE {$where}";
 
-        $this->mysqli->begin_transaction();
-        $this->mysqli->query($rawQuery);
-        $this->mysqli->commit();
-        $this->mysqli->close();
+        $this->db->begin_transaction();
+        $this->db->query($rawQuery);
+        $this->db->commit();
+        $this->db->close();
 
         return true;
     }
+    
 }
