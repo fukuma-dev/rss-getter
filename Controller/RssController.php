@@ -1,11 +1,13 @@
 <?php
 namespace Controller;
 include 'plugins/db.php';
+include 'Repository/RssRepository.php';
 include 'Service/RssService.php';
 require_once __DIR__.'/../vendor/autoload.php';
 
 use plugins\db;
 use Dotenv\Dotenv;
+use Repository\RssRepository;
 use Service\RssService;
 
 class RssController
@@ -29,9 +31,10 @@ class RssController
         $db = new db();
         $db = $db->dbConnect(getenv('DB_HOST'), getenv('DB_USER'), getenv('DB_PASS'), getenv('DB_NAME'));
 
-        $viewService = new RssService($db);
+        $repository = new RssRepository($db);
+        $rssService = new RssService($repository);
 
-        return $viewService->getDataByCondition($params);
+        return $rssService->getDataByCondition($params);
     }
 
     /**
