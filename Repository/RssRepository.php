@@ -157,7 +157,6 @@ class RssRepository implements RssRepositoryInterface
         $this->db->begin_transaction();
         $this->db->query($rawQuery);
         $this->db->commit();
-        $this->db->close();
 
         return true;
     }
