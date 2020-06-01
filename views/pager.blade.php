@@ -24,37 +24,23 @@
     }
 @endphp
 
-<div class="pager">
+<div style="display: -webkit-flex; display: flex; justify-content: center; margin: 50px auto; width: 300px; font-size: 30px;">
 @for ($i = 1; $i <= $max_page; $i++)
     @php($url = "../search.php?page_id=$i$queryString")
     @if ($i === $now)
-        <p style="font-weight: 900;">{{ $i }}</p>
+        <p style="font-weight: 900; margin: 0 10px;">{{ $i }}</p>
     @elseif ($i === 1 || $i === $max_page || ($i === $now + 1 && $now === $max_page -2) || ($i === $now - 1 && $now === 3))
-        <p>
+        <p style="margin: 0 10px;">
             <a href="{{ $url }}">{{ $i }}</a>
         </p>
     @elseif ($i === $now + 1 && $now !== $max_page - 2)
-        <p>
+        <p style="margin: 0 10px;">
             <a href="{{ $url }}">{{ $i }}</a><span style="margin-left: 20px;">...</span>
         </p>
     @elseif ($i === $now - 1 && $now !== 3)
-        <p>
+        <p style="margin: 0 10px;">
             <span style="margin-right: 20px;">...</span><a href="{{ $url }}">{{ $i }}</a>
         </p>
     @endif
 @endfor
 </div>
-
-<style>
-    .pager {
-        display: -webkit-flex;
-        display: flex;
-        justify-content: center;
-        margin: 50px auto;
-        width: 300px;
-        font-size: 30px;
-    }
-    .pager p {
-        margin: 0 10px;
-    }
-</style>
