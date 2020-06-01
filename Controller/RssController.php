@@ -18,7 +18,7 @@ class RssController
      */
     public function search(array $params)
     {
-        $error = $this->validation($params);
+        $error = $this->validate($params);
         if ($error !== []) {
             return ['error' => $error];
         }
@@ -40,7 +40,7 @@ class RssController
      * @param $params
      * @return array
      */
-    private function validation($params)
+    private function validate($params)
     {
         $error = [];
 
