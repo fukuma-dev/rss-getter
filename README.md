@@ -60,7 +60,10 @@ FC2の新着情報RSS (https://blog.fc2.com/newentry.rdf) からデータを取�
 Amazon Linux 2での導入を前提とします。
 
 #### 2.1 git clone
-こちらのファイルをプログラムを導入するサーバーでcloneします。
+
+サーバーのドキュメントルートに入り
+こちらのファイルをプログラムを導入するサーバーでcloneします。  
+ここでは`/var/www/html` をドキュメントルートとします。  
 http, sshはお好みで構いません。
 ```
 # http
@@ -75,14 +78,17 @@ git clone git@bitbucket.org:RyutaroFukuma/fc2-rss-getter.git
 アップロード先のディレクトリは/etc/httpd/conf/httpd.confにあるDocumentRootを指定するか  
 DocumentRootをアップロード先のディレクトリに変更してください。  
 
-ここではDocumentRootは `/var/www/html` をドキュメントルートとして設定します。
-
 Directory Indexをindex.html から index.phpに変更してください。
 
 httpd.confを変更した場合はapacheの再起動も行ってください。
 ```
 # apache再起動
 $ sudo service httpd restart
+```
+
+権限はchmodコマンドを用いて、適切に設定してください。
+```
+chmod 775 /var/www/html
 ```
 
 #### 2.3 composerのインストール(必須)
