@@ -10,7 +10,7 @@ class RssService
     /**
      * 1ページあたりの表示記事(ページャ用)
      */
-    const DISPLAY_MAX = 5;
+    const DISPLAY_MAX = 30;
     /**
      * 完全一致を条件とするパラメータ
      */
