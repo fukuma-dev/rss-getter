@@ -1,6 +1,5 @@
 <?php
 namespace Service;
-include __DIR__ . '/../Repository/RssRepository.php';
 
 use Repository\RssRepository;
 
@@ -21,9 +20,9 @@ class RssService
      */
     const LIKE_CONDITION_PARAMS = ['post_datetime', 'url', 'user_name'];
 
-    public function __construct($db)
+    public function __construct(RssRepository $repository)
     {
-        $this->repository = new RssRepository($db);
+        $this->repository = $repository;
     }
 
     /**
