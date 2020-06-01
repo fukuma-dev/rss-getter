@@ -5,7 +5,8 @@ FC2の新着情報RSS (https://blog.fc2.com/newentry.rdf) からデータを取�
 ### 技術詳細                                         
 - PHPのフレームワークは使わずに開発
 - テンプレートエンジンのBladeを使用
-- 環境変数の管理にcomposer経由でdotenvを利用
+- レイヤードアーキテクチャ
+- 環境変数管理やPHPUnitのためcomposerを一部利用
 
 ### 機能要件
 
@@ -26,7 +27,8 @@ FC2の新着情報RSS (https://blog.fc2.com/newentry.rdf) からデータを取�
 
 日付、URL、ユーザー名は部分一致  
 サーバー番号、エントリーNo.は完全一致 と解釈して実装しました。  
-ただし、エントリーNo.は指定したNo.以上の値も検索するか否かをチェックボックスで指定できます。
+ただし、エントリーNo.は指定したNo.以上の値も検索するか否かをチェックボックスで指定できます。  
+また、検索条件はクッキーに保存し、トップページに訪問すると検索フォームに条件が表示されます。
 ```
 検索条件
 日付、URL、ユーザー名、サーバー番号、エントリーNo.
@@ -58,7 +60,7 @@ FC2の新着情報RSS (https://blog.fc2.com/newentry.rdf) からデータを取�
 Amazon Linux 2での導入を前提とします。
 
 #### 2.1 git clone
-こちらのファイルをローカルにcloneします。
+こちらのファイルをプログラムを導入するサーバーでcloneします。
 http, sshはお好みで構いません。
 ```
 # http
@@ -68,19 +70,16 @@ git clone https://RyutaroFukuma@bitbucket.org/RyutaroFukuma/fc2-rss-getter.git
 git clone git@bitbucket.org:RyutaroFukuma/fc2-rss-getter.git
 ```
 
-#### 2.2 サーバーにファイルアップロード
-scpコマンドを用いてcloneしたファイルを対象のサーバーにアップロードします。  
-
-この際にPermission Deniedされる場合、  
-アップロード先のサーバーに入り、ディレクトリの権限をchmodを用いて一時的に変更する必要があります。  
+#### 2.2 apacheの設定変更
 
 アップロード先のディレクトリは/etc/httpd/conf/httpd.confにあるDocumentRootを指定するか  
 DocumentRootをアップロード先のディレクトリに変更してください。  
 
-その際にhttpd.confを変更した場合はapacheの再起動も行ってください。
+ここではDocumentRootは `/var/www/html` をドキュメントルートとして設定します。
 
-また、Directory Indexをindex.phpに変更してください。
+Directory Indexをindex.html から index.phpに変更してください。
 
+httpd.confを変更した場合はapacheの再起動も行ってください。
 ```
 # apache再起動
 $ sudo service httpd restart
@@ -89,7 +88,8 @@ $ sudo service httpd restart
 #### 2.3 composerのインストール(必須)
 
 composerがない場合はインストールが必要です。  
-phpdotenvというライブラリを使用してDBの接続情報をenvファイルで管理します。
+phpdotenvやPHPUnitを使用するために必要です。
+
 ```
 $ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 $ php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
@@ -128,9 +128,9 @@ DB作成と必要なテーブルの作成
 ```
 CREATE DATABASE IF NOT EXISTS rss_db;
 
-USE rss_db;
+USE rss_reader;
 
-CREATE TABLE `fc2_rss_feed` (
+CREATE TABLE `rss_data` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `title` varchar(255) DEFAULT NULL COMMENT '記事のタイトル',
   `description` varchar(255) DEFAULT NULL COMMENT '記事の概要',
@@ -153,7 +153,7 @@ RSSデータの取得と削除のコマンドを設定します。
 ```
 $ crontab -e
 
-# crontab.productionファイルと同じ内容を記載(ドキュメントルートによってパスが変わるので注意)
+# crontabファイルと同じ内容を記載(ドキュメントルートによってパスが変わるので注意)
 ```
 
 #### 2.7 simple-xmlのインストール(必須)
