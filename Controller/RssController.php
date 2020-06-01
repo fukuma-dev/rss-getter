@@ -1,9 +1,10 @@
 <?php
 namespace Controller;
+include 'plugins/db.php';
 include 'Service/RssService.php';
 require_once __DIR__.'/../vendor/autoload.php';
 
-use mysqli;
+use plugins\db;
 use Dotenv\Dotenv;
 use Service\RssService;
 
@@ -22,7 +23,12 @@ class RssController
             return ['error' => $error];
         }
 
-        $db = $this->dbConnection();
+        $env = Dotenv::createImmutable(__DIR__.'/..');
+        $env->load();
+
+        $db = new db();
+        $db = $db->dbConnect(getenv('DB_HOST'), getenv('DB_USER'), getenv('DB_PASS'), getenv('DB_NAME'));
+
         $viewService = new RssService($db);
 
         return $viewService->getDataByCondition($params);
@@ -51,22 +57,4 @@ class RssController
         return $error;
     }
 
-    /**
-     * @return mysqli
-     */
-    private function dbConnection()
-    {
-        $env = Dotenv::createImmutable(__DIR__.'/..');
-        $env->load();
-
-        // MySQL接続
-        $db = new mysqli(getenv('DB_HOST'), getenv('DB_USER'), getenv('DB_PASS'), getenv('DB_NAME'));
-        if (mysqli_connect_errno()) {
-            printf("Connect failed: %s\n", mysqli_connect_error());
-            exit();
-        } else {
-            $db->set_charset("utf8mb4");
-            return $db;
-        }
-    }
 }

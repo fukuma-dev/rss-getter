@@ -1,13 +1,15 @@
 <?php
-include __DIR__ . '/../Service/RssParser/RssParserService.php';
-include __DIR__ . '/../Service/UrlParser/Fc2UrlParser.php';
-include __DIR__ . '/../Repository/RssRepository.php';
+include 'plugins/db.php';
+include __DIR__.'/../Repository/RssRepository.php';
+include __DIR__.'/../Service/RssParser/RssParserService.php';
+include __DIR__.'/../Service/UrlParser/Fc2UrlParser.php';
 require_once __DIR__.'/../vendor/autoload.php';
 
 use Dotenv\Dotenv;
 use Service\RssParser\RssParserService;
 use Service\UrlParser\Fc2UrlParser;
 use Repository\RssRepository;
+use plugins\db;
 
 const TARGET_URL = 'https://blog.fc2.com/newentry.rdf';
 
@@ -23,28 +25,17 @@ foreach ($parsedRssData as $data) {
     array_push($dataForDb, array_merge($data, $dataByParsedUrl));
 }
 
-$db = dbConnection();
+$env = Dotenv::createImmutable(__DIR__.'/..');
+$env->load();
+
+$db = new db();
+$db = $db->dbConnect(getenv('DB_HOST'), getenv('DB_USER'), getenv('DB_PASS'), getenv('DB_NAME'));
+
 $rssRepository = new RssRepository($db);
 
 foreach ($dataForDb as $data) {
     $itemExists = $rssRepository->checkItemExists($data['url']);
     if ($itemExists == false) {
         $rssRepository->insertData($data);
-    }
-}
-
-function dbConnection()
-{
-    $env = Dotenv::createImmutable(__DIR__.'/..');
-    $env->load();
-
-    // MySQL接続
-    $db = new mysqli(getenv('DB_HOST'), getenv('DB_USER'), getenv('DB_PASS'), getenv('DB_NAME'));
-    if (mysqli_connect_errno()) {
-        printf("Connect failed: %s\n", mysqli_connect_error());
-        exit();
-    } else {
-        $db->set_charset("utf8mb4");
-        return $db;
     }
 }
