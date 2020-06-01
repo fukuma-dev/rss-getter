@@ -1,5 +1,5 @@
 <?php
-include 'plugins/db.php';
+include __DIR__.'/../plugins/db.php';
 include __DIR__.'/../Repository/RssRepository.php';
 require_once __DIR__.'/../vendor/autoload.php';
 

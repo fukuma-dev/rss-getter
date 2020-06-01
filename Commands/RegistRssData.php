@@ -1,5 +1,5 @@
 <?php
-include 'plugins/db.php';
+include __DIR__.'/../plugins/db.php';
 include __DIR__.'/../Repository/RssRepository.php';
 include __DIR__.'/../Service/RssParser/RssParserService.php';
 include __DIR__.'/../Service/UrlParser/Fc2UrlParser.php';
