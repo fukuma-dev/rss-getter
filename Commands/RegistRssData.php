@@ -39,3 +39,6 @@ foreach ($dataForDb as $data) {
         $rssRepository->insertData($data);
     }
 }
+
+$db->close();
+exit(0);

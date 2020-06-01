@@ -19,4 +19,5 @@ $rssRepository = new RssRepository($db);
 $conditions = [['create_date', '<', 'DATE_SUB(CURDATE(), INTERVAL 2 WEEK)']];
 $rssRepository->deleteDataByConditions($conditions);
 
+$db->close();
 exit(0);

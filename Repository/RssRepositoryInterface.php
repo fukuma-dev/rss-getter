@@ -11,7 +11,7 @@ interface RssRepositoryInterface
 
     public function combineSearchConditions(array $conditions);
 
-    public function getCountDisplayData($condition = []);
+    public function getRecordCounts($searchConditions = []);
 
     public function getDisplayDataForResultPage($conditions, $limit, $offset);
 

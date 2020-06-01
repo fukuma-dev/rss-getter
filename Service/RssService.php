@@ -31,29 +31,30 @@ class RssService
      * @param array $params
      * @return array
      */
-    public function getDataByCondition(array $params)
+    public function getDataByParams(array $params)
     {
-        $conditions = $this->createCondition($params);
+        $searchConditions = $this->createConditionByParams($params);
 
-        // ページャ用にレコード件数取得
-        $recordCounts = $this->repository->getCountDisplayData($conditions);
-
-        // 検索結果用の条件作成
         $pageId = $_GET['page_id'] ?: 1;
         $offset = ($pageId - 1) * self::DISPLAY_MAX;
 
-        $results = $this->repository->getDisplayDataForResultPage($conditions, self::DISPLAY_MAX, $offset);
+        $records = $this->repository->getDisplayDataForResultPage($searchConditions, self::DISPLAY_MAX, $offset);
+        $recordCounts = $this->repository->getRecordCounts($searchConditions);
 
-        return ['results' => $results, 'record_counts' => $recordCounts, 'display_max' => self::DISPLAY_MAX];
+        return [
+            'records' => $records,
+            'record_counts' => $recordCounts,
+            'display_max' => self::DISPLAY_MAX
+        ];
     }
 
     /**
      * 検索条件の作成
      *
      * @param $params
-     * @return array|string
+     * @return array
      */
-    private function createCondition($params)
+    private function createConditionByParams($params)
     {
         $conditions = [];
 
@@ -85,9 +86,6 @@ class RssService
             if ($value !== '' && in_array($key, self::LIKE_CONDITION_PARAMS)) {
                 array_push($conditions, $this->repository->getLikeCondition($key, $value));
             }
-        }
-        if ($conditions !== []) {
-            $conditions = $this->repository->combineSearchConditions($conditions);
         }
 
         return $conditions;

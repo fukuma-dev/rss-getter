@@ -20,9 +20,11 @@ class RssController
      */
     public function search(array $params)
     {
-        $error = $this->validate($params);
-        if ($error !== []) {
-            return ['error' => $error];
+        if ($params !== []) {
+            $error = $this->validate($params);
+            if ($error !== []) {
+                return ['error' => $error];
+            }
         }
 
         $env = Dotenv::createImmutable(__DIR__.'/..');
@@ -34,7 +36,10 @@ class RssController
         $repository = new RssRepository($db);
         $rssService = new RssService($repository);
 
-        return $rssService->getDataByCondition($params);
+        $data = $rssService->getDataByParams($params);
+        $db->close();
+
+        return $data;
     }
 
     /**

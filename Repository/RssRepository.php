@@ -60,12 +60,13 @@ class RssRepository implements RssRepositoryInterface
     /**
      * レコード数を取得
      *
-     * @param array $conditions
+     * @param array $searchConditions
      * @return int
      */
-    public function getCountDisplayData($conditions = [])
+    public function getRecordCounts($searchConditions = [])
     {
-        if ($conditions !== []) {
+        if ($searchConditions !== []) {
+            $conditions = $this->combineSearchConditions($searchConditions);
             $query = "SELECT COUNT(*) FROM rss_data WHERE {$conditions}";
         } else {
             $query = "SELECT COUNT(*) FROM rss_data";
@@ -85,15 +86,13 @@ class RssRepository implements RssRepositoryInterface
     public function getDisplayDataForResultPage($conditions, $limit, $offset)
     {
         if ($conditions !== []) {
+            $conditions = $this->combineSearchConditions($conditions);
             $query = "SELECT post_datetime, url, title, description FROM rss_data WHERE {$conditions} ORDER BY post_datetime desc LIMIT {$limit} OFFSET {$offset}";
         } else {
             $query = "SELECT post_datetime, url, title, description FROM rss_data ORDER BY post_datetime desc LIMIT {$limit} OFFSET {$offset}";
         }
 
-        $results = $this->db->query($query)->fetch_all();
-        $this->db->close();
-
-        return $results;
+        return $this->db->query($query)->fetch_all();
     }
 
     /**

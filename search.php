@@ -10,10 +10,10 @@ $cache = __DIR__.'/cache';
 $blade = new BladeOne($views, $cache,BladeOne::MODE_AUTO);
 
 $controller = new RssController();
-$results = $controller->search($_GET);
+$data = $controller->search($_GET);
 
 try {
-    echo $blade->run("search", ["data" => $results]);
+    echo $blade->run("search", ["data" => $data]);
     exit();
 } catch (\Exception $e) {
     printf($e->getMessage());
