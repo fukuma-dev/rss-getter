@@ -66,12 +66,12 @@ class RssRepository implements RssRepositoryInterface
     public function getCountDisplayData($conditions = [])
     {
         if ($conditions !== []) {
-            $query = "SELECT * FROM rss_data WHERE {$conditions}";
+            $query = "SELECT COUNT(*) FROM rss_data WHERE {$conditions}";
         } else {
-            $query = "SELECT * FROM rss_data";
+            $query = "SELECT COUNT(*) FROM rss_data";
         }
 
-        return $this->db->query($query)->num_rows;
+        return $this->db->query($query)->fetch_row()[0];
     }
 
     /**
