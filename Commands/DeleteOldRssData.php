@@ -16,7 +16,7 @@ $db = $db->dbConnect(getenv('DB_HOST'), getenv('DB_USER'), getenv('DB_PASS'), ge
 $rssRepository = new RssRepository($db);
 
 // ２週間経過したデータを削除
-$conditions = [['create_date', '<', 'DATE_SUB(CURDATE(), INTERVAL 2 WEEK)']];
+$conditions = [['post_datetime', '<', 'DATE_SUB(CURDATE(), INTERVAL 2 WEEK)']];
 $rssRepository->deleteDataByConditions($conditions);
 
 $db->close();
