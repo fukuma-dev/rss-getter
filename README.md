@@ -64,13 +64,24 @@ Amazon Linux 2での導入を前提とします。
 サーバーのドキュメントルートに入り
 こちらのファイルをプログラムを導入するサーバーでcloneします。  
 ここでは`/var/www/html` をドキュメントルートとします。  
+ディレクトリが存在しない場合は
+```
+$ sudo mkdir -p /var/www/html
+```
+
 http, sshはお好みで構いません。
 ```
 # http
-git clone https://RyutaroFukuma@bitbucket.org/RyutaroFukuma/fc2-rss-getter.git
+$ sudo git clone https://RyutaroFukuma@bitbucket.org/RyutaroFukuma/fc2-rss-getter.git
 
 # ssh
-git clone git@bitbucket.org:RyutaroFukuma/fc2-rss-getter.git
+$ sudo git clone git@bitbucket.org:RyutaroFukuma/fc2-rss-getter.git
+
+```
+
+gitがインストールされていない場合はyumを使ってインストールします。
+```
+$ sudo yum install git-all
 ```
 
 #### 2.2 apacheの設定変更
@@ -88,13 +99,13 @@ $ sudo service httpd restart
 
 権限はchmodコマンドを用いて、適切に設定してください。
 ```
-chmod 775 /var/www/html
+sudo chmod 775 /var/www/html
 ```
 
 #### 2.3 composerのインストール(必須)
 
 composerがない場合はインストールが必要です。  
-phpdotenvやPHPUnitを使用するために必要です。
+phpdotenvやsimplexml、PHPUnitを使用するために必要です。
 
 ```
 $ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -103,8 +114,9 @@ $ sudo php composer-setup.php  --install-dir=/usr/local/bin --filename=composer
 $ php -r "unlink('composer-setup.php');"
 ```
 
-既にcomposerが入っている場合は`composer install`してください。
+既にcomposerが入っている場合はディレクトリに入り、`composer install`してください。
 ```
+$ cd fc2-rss-getter
 $ composer install
 ```
 
@@ -160,13 +172,6 @@ RSSデータの取得と削除のコマンドを設定します。
 $ crontab -e
 
 # crontabファイルと同じ内容を記載(ドキュメントルートによってパスが変わるので注意)
-```
-
-#### 2.7 simple-xmlのインストール(必須)
-
-simplexml_load_stringを使用するためにインストールします。
-```
-yum -y install --enablerepo=remi,epel,remi-php70 php php-devel php-intl php-mbstring php-pdo php-gd php-mysqlnd php-xml
 ```
 
 #### タイムゾーンを'Asia/Tokyo'に変更(任意)
