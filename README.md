@@ -102,16 +102,23 @@ $ sudo service httpd restart
 sudo chmod 775 /var/www/html
 ```
 
-#### 2.3 composerのインストール(必須)
+#### 2.3 simple-xmlのインストール(必須)
+
+simplexml_load_stringを使用するためにインストールします。
+```
+-yum -y install --enablerepo=remi,epel,remi-php70 php php-devel php-intl php-mbstring php-pdo php-gd php-mysqlnd php-xml
+```
+
+#### 2.4 composerのインストール(必須)
 
 composerがない場合はインストールが必要です。  
 phpdotenvやsimplexml、PHPUnitを使用するために必要です。
 
 ```
-$ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-$ php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+$ sudo php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+$ sudo php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 $ sudo php composer-setup.php  --install-dir=/usr/local/bin --filename=composer
-$ php -r "unlink('composer-setup.php');"
+$ sudo php -r "unlink('composer-setup.php');"
 ```
 
 既にcomposerが入っている場合はディレクトリに入り、`composer install`してください。
@@ -120,7 +127,7 @@ $ cd fc2-rss-getter
 $ composer install
 ```
 
-#### 2.4 env作成(必須)
+#### 2.5 env作成(必須)
 
 DBの接続情報を管理するため、envファイルを作成します。
 
@@ -137,14 +144,14 @@ DB_PASS=""
 DB_NAME="rss_db"
 ```
 
-#### 2.5 DB・テーブル作成
+#### 2.6 DB・テーブル作成
 
 MySQLにログインできることが前提となります。
 MySQLが入ってない場合は後述する` Amazon Linux 2 における PHP, MySQL, Apacheの導入` をご覧ください。
 
 DB作成と必要なテーブルの作成
 ```
-CREATE DATABASE IF NOT EXISTS rss_db;
+CREATE DATABASE IF NOT EXISTS rss_reader;
 
 USE rss_reader;
 
@@ -162,7 +169,7 @@ CREATE TABLE `rss_data` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2729 DEFAULT CHARSET=utf8mb4 COMMENT='RSSデータ';
 ```
 
-#### 2.6 cronの設定(必須)
+#### 2.7 cronの設定(必須)
 
 Linuxにログインできることが前提となります。  
 EC2のAmazon Linux 2で設定をしています。  
@@ -246,8 +253,8 @@ Redirecting to /bin/systemctl start mysqld.service
 $ sudo cat /var/log/mysqld.log | grep "temporary password"
 2020-05-30T15:45:22.929075Z 1 [Note] A temporary password is generated for root@localhost: `********`
 
-# パスワード変更
-$ set password for root@localhost=password('********');
+# パスワード変更 (デフォルトパスワードでmysqlログイン後)
+mysql> set password for root@localhost=password('********');
 ```
 
 #### Apache
